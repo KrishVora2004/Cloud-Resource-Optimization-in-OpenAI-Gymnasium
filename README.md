@@ -26,11 +26,12 @@ The project follows a modular, research-oriented design:
 ```
 project/
 │
-├── sim/        → Cloud system simulation logic
-├── envs/       → Gymnasium RL environment wrapper
-├── agents/     → PPO and DQN training implementations
-├── tests/      → Unit tests for validation
-└── models/     → Saved trained models
+├── sim/          → Cloud system simulation logic
+├── envs/         → Gymnasium RL environment wrapper
+├── agents/       → PPO and DQN training implementations
+├── tests/        → Unit tests for validation
+├──models/        → Saved trained models
+└── evaluation/   → has baseleine and evalution,plotting modules
 ```
 
 ---
