@@ -1,0 +1,98 @@
+# evaluation/evaluate.py
+
+import numpy as np
+from envs.cloud_env import CloudEnv
+from stable_baselines3 import PPO, DQN
+from .baseline import threshold_policy
+import matplotlib.pyplot as plt
+from .plot_results import plot_instances_vs_workload
+
+
+def run_episode(env, policy_fn=None, model=None):
+
+    state, _ = env.reset()
+
+    done = False
+
+    total_cost = 0
+    total_error = 0
+    total_response = 0
+
+    instances_history = []
+    workload_history = []
+
+    steps = 0
+
+    while not done:
+
+        if model:
+            action, _ = model.predict(state, deterministic=True)
+        else:
+            action = policy_fn(state)
+
+        next_state, reward, terminated, truncated, _ = env.step(action)
+
+        # Extract metrics
+        instances = next_state[1]
+        utilization = next_state[2]
+        error_rate = next_state[3]
+        response_time = next_state[4]
+
+        # Approx cost
+        cost = instances
+
+        total_cost += cost
+        total_error += error_rate
+        total_response += response_time
+
+        instances_history.append(instances)
+        workload_history.append(next_state[0])
+
+        state = next_state
+        steps += 1
+
+        done = terminated or truncated
+
+    return {
+        "cost": total_cost / steps,
+        "error": total_error / steps,
+        "response": total_response / steps,
+        "instances": instances_history,
+        "workload": workload_history
+    }
+
+
+def evaluate_all():
+
+    env = CloudEnv()
+
+    # Load models
+    ppo_model = PPO.load("models/ppo_cloud")
+    dqn_model = DQN.load("models/dqn_cloud")
+
+    print("Running PPO...")
+    ppo_results = run_episode(env, model=ppo_model)
+
+    print("Running DQN...")
+    dqn_results = run_episode(env, model=dqn_model)
+
+    print("Running Baseline...")
+    baseline_results = run_episode(env, policy_fn=threshold_policy)
+
+    return ppo_results, dqn_results, baseline_results
+
+
+if __name__ == "__main__":
+
+    ppo, dqn, baseline = evaluate_all()
+
+    print("\n--- RESULTS ---")
+    print(f"PPO -> Cost: {ppo['cost']:.2f}, Error: {ppo['error']:.3f}, Response: {ppo['response']:.3f}")
+    print(f"DQN -> Cost: {dqn['cost']:.2f}, Error: {dqn['error']:.3f}, Response: {dqn['response']:.3f}")
+    print(f"BASELINE -> Cost: {baseline['cost']:.2f}, Error: {baseline['error']:.3f}, Response: {baseline['response']:.3f}")
+    results = {
+        "PPO": ppo,
+        "DQN": dqn,
+        "BASELINE": baseline
+    }
+    plot_instances_vs_workload(results)
