@@ -94,4 +94,8 @@ Each trained model is saved with:
 
 - Ensure the environment is properly configured before training  
 - Use higher training steps for better convergence  
+<<<<<<< HEAD
 - PPO is generally more stable for dynamic workloads, while DQN is faster for simpler decision spaces  
+=======
+- PPO is generally more stable for dynamic workloads, while DQN is faster for simpler decision spaces  
+>>>>>>> fcf9ffe6f29609ac648e20df0fd8ec31465ee8e1

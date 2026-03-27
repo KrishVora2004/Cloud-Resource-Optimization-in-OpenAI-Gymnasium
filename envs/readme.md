@@ -66,4 +66,8 @@ This environment acts as the testing ground where RL agents learn optimal scalin
 
 - Designed to be deterministic or stochastic depending on workload generation.
 - Can be extended to include more realistic cloud metrics.
+<<<<<<< HEAD
 - Compatible with PPO and DQN agents without modification.
+=======
+- Compatible with PPO and DQN agents without modification.
+>>>>>>> fcf9ffe6f29609ac648e20df0fd8ec31465ee8e1
